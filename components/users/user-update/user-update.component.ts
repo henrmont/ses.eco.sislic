@@ -18,8 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiResponse } from '../../../../core/models/api-response.model';
 import { MessageService } from '../../../../core/services/message-service';
 
-// Services, Enums & Local Components
-import { Professionals } from '../../../enums/professionals';
+// Services & Local Components
 import { UserService } from '../../../services/user.service';
 import { ProfessionalTypesComponent } from '../professional-types/professional-types.component';
 import { ProfessionalType } from '../../../models/professional-type.model';
@@ -34,10 +33,8 @@ type UserUpdateDialogData = {
     email?: string;
     professional?: {
       name?: string;
-      cns?: string;
+      phone?: string;
       registration?: string;
-      professional_register?: string;
-      cbo?: string;
       types?: Array<ProfessionalType | string>;
     };
   };
@@ -95,9 +92,9 @@ export class UserUpdateComponent implements OnInit {
     types: [
       { type: 'required', message: 'Selecione ao menos um tipo de profissional.' }
     ],
-    cns: [
-      { type: 'required', message: 'O CNS é obrigatório.' },
-      { type: 'cnsExists', message: 'O CNS informado já está em uso.' }
+    phone: [
+      { type: 'required', message: 'O telefone é obrigatório.' },
+      { type: 'phoneExists', message: 'O telefone informado já está em uso.' }
     ],
     registration: [
       { type: 'required', message: 'A matrícula é obrigatória.' }
@@ -109,8 +106,6 @@ export class UserUpdateComponent implements OnInit {
   // ==========================================
   ngOnInit(): void {
     this.initForm();
-    this.setupProfessionalTypesListener();
-    this.loadInitialPermissions();
   }
 
   // ==========================================
@@ -123,7 +118,7 @@ export class UserUpdateComponent implements OnInit {
 
   protected onSubmit(): void {
     const userId = this.data?.user?.id;
-    
+
     if (!userId) {
       this.messageService.showMessage('Identificador do usuário inválido.');
       return;
@@ -143,7 +138,6 @@ export class UserUpdateComponent implements OnInit {
           this.isSubmitting.set(false);
           this.userForm.enable({ emitEvent: false });
           this.userForm.get('email')?.disable({ emitEvent: false });
-          this.evaluateProfessionalControls(this.userForm.get('types')?.value || []);
         }),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -165,7 +159,7 @@ export class UserUpdateComponent implements OnInit {
   private initForm(): void {
     const professional = this.data?.user?.professional;
     const initialEmail = this.data?.user?.email || null;
-    const initialCns = professional ? professional.cns : null;
+    const initialPhone = professional ? professional.phone : null;
 
     const initialTypes: string[] = professional?.types
       ? professional.types.map((t: ProfessionalType | string) => typeof t === 'string' ? t : t.type)
@@ -175,50 +169,12 @@ export class UserUpdateComponent implements OnInit {
       name: [professional ? professional.name : '', [Validators.required]],
       email: [{ value: initialEmail, disabled: true }, [Validators.required, Validators.email]],
       types: [initialTypes, [Validators.required]],
-      cns: [
-        initialCns, 
-        [Validators.required], 
-        [this.userService.cnsUserExistsValidator(initialCns)]
+      phone: [
+        initialPhone,
+        [Validators.required],
       ],
-      registration: [professional ? professional.registration : '', [Validators.required]],
-      professional_register: [{ value: professional ? professional.professional_register : '', disabled: true }],
-      cbo: [{ value: professional ? professional.cbo : '', disabled: true }]
+      registration: [professional ? professional.registration : '', [Validators.required]]
     });
-  }
-
-  private loadInitialPermissions(): void {
-    const initialTypes = this.userForm.get('types')?.value || [];
-    this.evaluateProfessionalControls(initialTypes);
-  }
-
-  private setupProfessionalTypesListener(): void {
-    this.userForm.get('types')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((selectedTypes: string[]) => {
-        this.evaluateProfessionalControls(selectedTypes || []);
-      });
-  }
-
-  private evaluateProfessionalControls(selectedTypes: string[]): void {
-    const hasMedico = selectedTypes.includes(Professionals.MEDICO);
-    const hasAssistenteSocial = selectedTypes.includes(Professionals.ASSISTENTE_SOCIAL);
-
-    const professionalRegisterCtrl = this.userForm.get('professional_register');
-    const cboCtrl = this.userForm.get('cbo');
-
-    if (hasMedico || hasAssistenteSocial) {
-      professionalRegisterCtrl?.enable();
-    } else {
-      professionalRegisterCtrl?.disable();
-      professionalRegisterCtrl?.reset();
-    }
-
-    if (hasMedico) {
-      cboCtrl?.enable();
-    } else {
-      cboCtrl?.disable();
-      cboCtrl?.reset();
-    }
   }
 
   private openDialog<T>(

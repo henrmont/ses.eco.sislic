@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Injector, OnDestroy, OnInit, effect, inject, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, effect, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ComponentType } from '@angular/cdk/portal';
@@ -31,10 +31,12 @@ import { UserLockComponent } from '../../components/users/user-lock/user-lock.co
 import { UserRolesComponent } from '../../components/users/user-roles/user-roles.component';
 import { UserUpdateComponent } from '../../components/users/user-update/user-update.component';
 import { UserValidateComponent } from '../../components/users/user-validate/user-validate.component';
+// Importe aqui o componente de diálogo dos locais de trabalho quando criado:
+// import { UserWorkplacesComponent } from '../../components/users/user-workplaces/user-workplaces.component';
 
 interface UserTableRow extends User {
   is_editable: boolean;
-  cns: string;
+  phone: string;
 }
 
 interface UsersDialogData {
@@ -62,7 +64,7 @@ interface UsersDialogData {
 })
 export class UsersPage implements OnInit, OnDestroy {
   // Canais de Comunicação Externa
-  private readonly usersChannel = new BroadcastChannel('tfd-users-channel');
+  private readonly usersChannel = new BroadcastChannel('sislic-users-channel');
 
   // Injeção de Dependências
   private readonly userService = inject(UserService);
@@ -70,7 +72,6 @@ export class UsersPage implements OnInit, OnDestroy {
   private readonly overlay = inject(Overlay);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly injector = inject(Injector);
 
   // Queries Reativas da View
   private readonly userSort = viewChild<MatSort>('userSort');
@@ -84,15 +85,24 @@ export class UsersPage implements OnInit, OnDestroy {
     'is_editable',
     'email',
     'name',
-    'cns',
+    'phone',
     'is_valid',
     'actions'
   ];
 
   protected readonly dataSource = new MatTableDataSource<UserTableRow>([]);
 
+  constructor() {
+    effect(() => {
+      const sort = this.userSort();
+      const paginator = this.userPaginator();
+
+      if (sort) this.dataSource.sort = sort;
+      if (paginator) this.dataSource.paginator = paginator;
+    });
+  }
+
   ngOnInit(): void {
-    this.setupTableBindings();
     this.fetchUsers(true);
     this.listenToBroadcastChannel();
   }
@@ -136,6 +146,11 @@ export class UsersPage implements OnInit, OnDestroy {
     this.openDialog(UserRolesComponent, { user }, '700px');
   }
 
+  protected userWorkplaces(user: User): void {
+    // Subtituir pelo seu componente de diálogo correspondente aos locais de trabalho
+    // this.openDialog(UserWorkplacesComponent, { user }, '700px');
+  }
+
   protected userDelete(user: User): void {
     this.openDialog(UserDeleteComponent, { user });
   }
@@ -151,17 +166,6 @@ export class UsersPage implements OnInit, OnDestroy {
   // ==========================================
   // Métodos Privados
   // ==========================================
-  private setupTableBindings(): void {
-    // Registra o efeito no ciclo de inicialização (ngOnInit) usando o DestroyRef da classe
-    effect(() => {
-      const sort = this.userSort();
-      const paginator = this.userPaginator();
-
-      if (sort) this.dataSource.sort = sort;
-      if (paginator) this.dataSource.paginator = paginator;
-    }, { injector: this.injector });
-  }
-
   private fetchUsers(showLoading = false): void {
     if (showLoading) this.openLoading();
 
@@ -193,7 +197,7 @@ export class UsersPage implements OnInit, OnDestroy {
     };
   }
 
-  private mapUserToRow(item: Partial<User> & { professional?: { name?: string; cns?: string } }): UserTableRow {
+  private mapUserToRow(item: Partial<User> & { professional?: { name?: string; phone?: string } }): UserTableRow {
     const userObj: User = {
       id: item.id!,
       email: item.email || '',
@@ -205,7 +209,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
     return {
       ...userObj,
-      cns: item.professional?.cns || '-',
+      phone: item.professional?.phone || '-',
       is_editable: this.calculateEditable(userObj)
     };
   }

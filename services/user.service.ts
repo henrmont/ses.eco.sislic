@@ -13,7 +13,7 @@ import { User } from '../models/user.model';
 })
 export class UserService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiTfdUrl}/users`;
+  private readonly apiUrl = `${environment.apiSislicUrl}/users`;
 
   getMe(): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/me`);

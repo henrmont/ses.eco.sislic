@@ -247,7 +247,7 @@ export class SislicLayout implements OnInit, OnDestroy {
         },
         { 
           label: 'Novo local de trabalho', 
-          icon: 'person_add', 
+          icon: 'add_circle_outline', 
           types: [Professionals.ADMINISTRADOR], 
           permissions: ['local de trabalho criar'], 
           action: () => this.workplaceCreate() 

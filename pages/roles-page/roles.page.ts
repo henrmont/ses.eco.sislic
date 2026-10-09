@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, Injector, inject, OnDestroy, OnInit, viewChild, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnDestroy, OnInit, viewChild, effect } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -50,7 +50,7 @@ type RolesDialogData = {
 })
 export class RolesPage implements OnInit, OnDestroy {
   // Instância própria da página
-  private readonly rolesChannel = new BroadcastChannel('tfd-roles-channel');
+  private readonly rolesChannel = new BroadcastChannel('sislic-roles-channel');
 
   // ==========================================
   // Injeção de Dependências
@@ -60,7 +60,6 @@ export class RolesPage implements OnInit, OnDestroy {
   private readonly overlay = inject(Overlay);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly injector = inject(Injector);
 
   // ==========================================
   // ViewChildren / Elementos da View
@@ -77,11 +76,20 @@ export class RolesPage implements OnInit, OnDestroy {
   protected readonly displayedColumns: string[] = ['name', 'actions'];
   protected readonly dataSource = new MatTableDataSource<Role>([]);
 
+  constructor() {
+    effect(() => {
+      const sort = this.roleSort();
+      const paginator = this.rolePaginator();
+
+      if (sort) this.dataSource.sort = sort;
+      if (paginator) this.dataSource.paginator = paginator;
+    });
+  }
+
   // ==========================================
   // Ciclo de Vida (Hooks)
   // ==========================================
   ngOnInit(): void {
-    this.setupTableBindings();
     this.fetchRoles(true);
     this.listenToBroadcastChannel();
   }
@@ -129,16 +137,6 @@ export class RolesPage implements OnInit, OnDestroy {
   // ==========================================
   // Métodos Privados / Auxiliares
   // ==========================================
-  private setupTableBindings(): void {
-    effect(() => {
-      const sort = this.roleSort();
-      const paginator = this.rolePaginator();
-
-      if (sort) this.dataSource.sort = sort;
-      if (paginator) this.dataSource.paginator = paginator;
-    }, { injector: this.injector });
-  }
-
   private fetchRoles(showLoading = false): void {
     if (showLoading) this.openLoading();
 

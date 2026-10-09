@@ -67,13 +67,7 @@ export class RoleUpdateComponent implements OnInit {
   protected readonly permissionGroups = [
     { label: 'USUÁRIOS', icon: 'people', filter: 'usuário' },
     { label: 'REGRAS', icon: 'security', filter: 'regra' },
-    { label: 'CONFIGURAÇÕES', icon: 'settings', filter: 'configuração' },
-    { label: 'PACIENTES', icon: 'personal_injury', filter: 'paciente' },
-    { label: 'SOLICITAÇÕES', icon: 'assignment', filter: 'solicitação' },
-    { label: 'PARECERES', icon: 'grading', filter: 'parecer' },
-    { label: 'PASSAGENS', icon: 'luggage', filter: 'passagem' },
-    { label: 'AJUDAS DE CUSTO', icon: 'price_check', filter: 'ajuda de custo' },
-    { label: 'PAGAMENTOS', icon: 'payments', filter: 'pagamento' }
+    { label: 'LOCAIS DE TRABALHO', icon: 'workspaces', filter: 'local de trabalho' },
   ];
 
   protected readonly errorMessages: Record<string, Array<{ type: string; message: string }>> = {

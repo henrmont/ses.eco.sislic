@@ -18,8 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiResponse } from '../../../../core/models/api-response.model';
 import { MessageService } from '../../../../core/services/message-service';
 
-// Services, Enums & Local Components
-import { Professionals } from '../../../enums/professionals';
+// Services & Local Components
 import { UserService } from '../../../services/user.service';
 import { ProfessionalTypesComponent } from '../professional-types/professional-types.component';
 
@@ -79,9 +78,9 @@ export class UserCreateComponent implements OnInit {
     types: [
       { type: 'required', message: 'Selecione ao menos um tipo de profissional.' }
     ],
-    cns: [
-      { type: 'required', message: 'O CNS é obrigatório.' },
-      { type: 'cnsExists', message: 'O CNS informado já está em uso.' }
+    phone: [
+      { type: 'required', message: 'O telefone é obrigatório.' },
+      { type: 'phoneExists', message: 'O telefone informado já está em uso.' }
     ],
     registration: [
       { type: 'required', message: 'A matrícula é obrigatória.' }
@@ -93,7 +92,6 @@ export class UserCreateComponent implements OnInit {
   // ==========================================
   ngOnInit(): void {
     this.initForm();
-    this.setupProfessionalTypesListener();
   }
 
   // ==========================================
@@ -118,7 +116,6 @@ export class UserCreateComponent implements OnInit {
         finalize(() => {
           this.isSubmitting.set(false);
           this.userForm.enable({ emitEvent: false });
-          this.evaluateProfessionalControls(this.userForm.get('types')?.value || []);
         }),
         takeUntilDestroyed(this.destroyRef)
       )
@@ -146,45 +143,12 @@ export class UserCreateComponent implements OnInit {
         [this.userService.emailUserExistsValidator(null)]
       ],
       types: [<string[]>[], [Validators.required]],
-      cns: [
+      phone: [
         '',
         [Validators.required],
-        [this.userService.cnsUserExistsValidator(null)]
       ],
-      registration: ['', [Validators.required]],
-      professional_register: [{ value: '', disabled: true }],
-      cbo: [{ value: '', disabled: true }]
+      registration: ['', [Validators.required]]
     });
-  }
-
-  private setupProfessionalTypesListener(): void {
-    this.userForm.get('types')?.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((selectedTypes: string[]) => {
-        this.evaluateProfessionalControls(selectedTypes || []);
-      });
-  }
-
-  private evaluateProfessionalControls(selectedTypes: string[]): void {
-    const hasMedico = selectedTypes.includes(Professionals.MEDICO);
-    const hasAssistenteSocial = selectedTypes.includes(Professionals.ASSISTENTE_SOCIAL);
-
-    const professionalRegisterCtrl = this.userForm.get('professional_register');
-    const cboCtrl = this.userForm.get('cbo');
-
-    if (hasMedico || hasAssistenteSocial) {
-      professionalRegisterCtrl?.enable();
-    } else {
-      professionalRegisterCtrl?.disable();
-      professionalRegisterCtrl?.reset();
-    }
-
-    if (hasMedico) {
-      cboCtrl?.enable();
-    } else {
-      cboCtrl?.disable();
-      cboCtrl?.reset();
-    }
   }
 
   private openDialog<T>(

@@ -18,10 +18,8 @@ export type UserDetailDialogData = {
     email?: string;
     professional?: {
       name?: string;
-      cns?: string;
+      phone?: string;
       registration?: string;
-      professional_register?: string;
-      cbo?: string;
       types?: Array<ProfessionalType | string>;
     };
   };

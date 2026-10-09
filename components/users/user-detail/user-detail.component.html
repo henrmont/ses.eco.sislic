@@ -30,24 +30,15 @@
       <mat-card-content>
         <div class="line cols-1-1">
           <div>
-            <strong>CNS:</strong>
-            @if (professional?.cns; as cnsVal) {
-              {{ cnsVal | mask: '000 0000 0000 0000' }}
+            <strong>Telefone:</strong>
+            @if (professional?.phone; as phoneVal) {
+              {{ phoneVal | mask: '(00) 00000-0000' }}
             } @else {
               Não informado
             }
           </div>
           <div>
             <strong>Matrícula:</strong> {{ professional?.registration || 'Não informado' }}
-          </div>
-        </div>
-
-        <div class="line cols-1-1">
-          <div>
-            <strong>Registro Profissional:</strong> {{ professional?.professional_register || 'Não informado' }}
-          </div>
-          <div>
-            <strong>CBO:</strong> {{ professional?.cbo || 'Não informado' }}
           </div>
         </div>
       </mat-card-content>
