@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, OnDestroy, OnInit, effect, inject, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
 import { ComponentType } from '@angular/cdk/portal';
 import { Overlay } from '@angular/cdk/overlay';
 import { finalize } from 'rxjs';
@@ -19,9 +18,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Core & Models
 import { LoadingComponent } from '../../../core/components/loading-component/loading-component';
-import { Permission } from '../../models/permission.model';
-import { Role } from '../../models/role.model';
-import { User } from '../../models/user.model';
+import { Permission } from '../../../core/models/permission.model';
+import { Role } from '../../../core/models/role.model';
+import { SislicUser } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
 
 // Dialog Components
@@ -31,16 +30,17 @@ import { UserLockComponent } from '../../components/users/user-lock/user-lock.co
 import { UserRolesComponent } from '../../components/users/user-roles/user-roles.component';
 import { UserUpdateComponent } from '../../components/users/user-update/user-update.component';
 import { UserValidateComponent } from '../../components/users/user-validate/user-validate.component';
+import { AuthService } from '../../services/auth.service';
 // Importe aqui o componente de diálogo dos locais de trabalho quando criado:
 // import { UserWorkplacesComponent } from '../../components/users/user-workplaces/user-workplaces.component';
 
-interface UserTableRow extends User {
+interface UserTableRow extends SislicUser {
   is_editable: boolean;
   phone: string;
 }
 
 interface UsersDialogData {
-  user: User;
+  user: SislicUser;
 }
 
 @Component({
@@ -68,9 +68,9 @@ export class UsersPage implements OnInit, OnDestroy {
 
   // Injeção de Dependências
   private readonly userService = inject(UserService);
+  private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
   private readonly overlay = inject(Overlay);
-  private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
 
   // Queries Reativas da View
@@ -79,7 +79,7 @@ export class UsersPage implements OnInit, OnDestroy {
 
   // Estado e Controle
   private loadingDialog?: MatDialogRef<LoadingComponent>;
-  private readonly currentUser: User | undefined = this.route.parent?.snapshot.data['user'];
+  private readonly currentUser: SislicUser | null = this.authService.getCurrentUser();
 
   protected readonly displayedColumns: string[] = [
     'is_editable',
@@ -134,32 +134,32 @@ export class UsersPage implements OnInit, OnDestroy {
   }
 
   // Ações da Tabela
-  protected userLock(user: User): void {
+  protected userLock(user: SislicUser): void {
     this.openDialog(UserLockComponent, { user });
   }
 
-  protected userValidate(user: User): void {
+  protected userValidate(user: SislicUser): void {
     this.openDialog(UserValidateComponent, { user });
   }
 
-  protected userRoles(user: User): void {
+  protected userRoles(user: SislicUser): void {
     this.openDialog(UserRolesComponent, { user }, '700px');
   }
 
-  protected userWorkplaces(user: User): void {
+  protected userWorkplaces(user: SislicUser): void {
     // Subtituir pelo seu componente de diálogo correspondente aos locais de trabalho
     // this.openDialog(UserWorkplacesComponent, { user }, '700px');
   }
 
-  protected userDelete(user: User): void {
+  protected userDelete(user: SislicUser): void {
     this.openDialog(UserDeleteComponent, { user });
   }
 
-  protected userUpdate(user: User): void {
+  protected userUpdate(user: SislicUser): void {
     this.openDialog(UserUpdateComponent, { user }, '700px');
   }
 
-  protected userDetail(user: User): void {
+  protected userDetail(user: SislicUser): void {
     this.openDialog(UserDetailComponent, { user }, '700px');
   }
 
@@ -197,8 +197,8 @@ export class UsersPage implements OnInit, OnDestroy {
     };
   }
 
-  private mapUserToRow(item: Partial<User> & { professional?: { name?: string; phone?: string } }): UserTableRow {
-    const userObj: User = {
+  private mapUserToRow(item: Partial<SislicUser> & { professional?: { name?: string; phone?: string } }): UserTableRow {
+    const userObj: SislicUser = {
       id: item.id!,
       email: item.email || '',
       name: item.professional?.name || item.name || '',
@@ -214,7 +214,7 @@ export class UsersPage implements OnInit, OnDestroy {
     };
   }
 
-  private calculateEditable(user: User): boolean {
+  private calculateEditable(user: SislicUser): boolean {
     if (!this.currentUser || this.currentUser.id === user.id) return false;
     return !user.module?.pivot?.is_editable;
   }
