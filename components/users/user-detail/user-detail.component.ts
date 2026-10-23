@@ -10,17 +10,25 @@ import { NgxMaskPipe } from 'ngx-mask';
 
 // Models
 import { ProfessionalType } from '../../../models/professional-type.model';
+import { ProfessionalWorkplace } from '../../../models/professional-workplace.model';
+import { Workplace } from '../../../models/workplace.model';
+
+// ============================================================================
+// Tipos e Interfaces
+// ============================================================================
 
 export type UserDetailDialogData = {
   user?: {
-    id?: string;
+    id?: string | number;
     name?: string;
     email?: string;
     professional?: {
+      id?: number;
       name?: string;
       phone?: string;
       registration?: string;
       types?: Array<ProfessionalType | string>;
+      workplaces?: Array<Workplace | ProfessionalWorkplace>;
     };
   };
 };
@@ -62,5 +70,21 @@ export class UserDetailComponent {
     if (!rawTypes || !Array.isArray(rawTypes)) return [];
 
     return rawTypes.map(t => (typeof t === 'string' ? t : t.type));
+  }
+
+  protected get workplaces(): Array<{ id?: number; label: string }> {
+    const rawWorkplaces = this.professional?.workplaces;
+    if (!rawWorkplaces || !Array.isArray(rawWorkplaces)) return [];
+
+    return rawWorkplaces.map((item: any) => {
+      const name = item.name ?? item.workplace?.name ?? 'Local sem nome';
+      const budgetEntity = item.budget_entity ?? item.workplace?.budget_entity;
+      const label = budgetEntity ? `${name}` : name;
+
+      return {
+        id: item.id ?? item.workplace_id,
+        label
+      };
+    });
   }
 }

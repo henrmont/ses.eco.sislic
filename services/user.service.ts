@@ -7,6 +7,7 @@ import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../../core/models/api-response.model';
 import { Role } from '../../core/models/role.model';
 import { SislicUser } from '../models/user.model';
+import { ProfessionalWorkplace } from '../models/professional-workplace.model';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,10 @@ export class UserService {
 
   getRoles(): Observable<Role[]> {
     return this.http.get<Role[]>(`${this.apiUrl}/roles`);
+  }
+
+  getProfessionalWorkplaces(professionalId: number): Observable<ProfessionalWorkplace[]> {
+    return this.http.get<ProfessionalWorkplace[]>(`${this.apiUrl}/professionals/${professionalId}/workplaces`);
   }
 
   // ==========================================
@@ -58,6 +63,17 @@ export class UserService {
 
   rolesUser(userId: number, data: Role[]): Observable<ApiResponse> {
     return this.http.patch<ApiResponse>(`${this.apiUrl}/${userId}/roles`, data);
+  }
+
+  // ==========================================
+  // Workplaces
+  // ==========================================
+  attachWorkplace(professionalId: number, workplaceId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/professionals/${professionalId}/workplaces`, { workplace_id: workplaceId });
+  }
+
+  detachWorkplace(professionalId: number, professionalWorkplaceId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/professionals/${professionalId}/workplaces/${professionalWorkplaceId}`);
   }
 
   // ==========================================

@@ -67,6 +67,29 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- LOCAIS DE TRABALHO -->
+    <mat-card appearance="outlined" class="detail-card">
+      <mat-card-header>
+        <mat-card-subtitle>LOCAIS DE TRABALHO</mat-card-subtitle>
+      </mat-card-header>
+      
+      <mat-card-content>
+        <div class="line cols-1-col">
+          <div>
+            @if (workplaces.length) {
+              <mat-chip-set aria-label="Locais de trabalho vinculados">
+                @for (wp of workplaces; track wp.id ?? $index) {
+                  <mat-chip>{{ wp.label }}</mat-chip>
+                }
+              </mat-chip-set>
+            } @else {
+              <span class="empty-text">Nenhum local de trabalho vinculado</span>
+            }
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
   </div>
 </mat-dialog-content>
 

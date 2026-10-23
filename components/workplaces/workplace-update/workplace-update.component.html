@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>Atualizar Local de Trabalho</h2>
+
+<form [formGroup]="workplaceForm">
+  <mat-dialog-content>
+    
+    <!-- Linha 1: Unidade Orçamentária -->
+    <div class="line">
+      <mat-form-field appearance="outline">
+        <mat-label>Unidade Orçamentária</mat-label>
+        <input 
+          matInput 
+          type="text" 
+          mask="00.000" 
+          [dropSpecialCharacters]="false"
+          [validation]="false"
+          placeholder="00.000" 
+          formControlName="budget_entity">
+        @for (item of errorMessages['budget_entity']; track $index) {
+          <mat-error [hidden]="!workplaceForm.get('budget_entity')?.hasError(item.type)">
+            {{ item.message }}
+          </mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Linha 2: Nome do Local de Trabalho -->
+    <div class="line">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome do Local de Trabalho</mat-label>
+        <input matInput type="text" formControlName="name">
+        @for (item of errorMessages['name']; track $index) {
+          <mat-error [hidden]="!workplaceForm.get('name')?.hasError(item.type)">
+            {{ item.message }}
+          </mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Linha 3: Unidade Superior (Autocomplete) -->
+    <div class="line">
+      <mat-form-field appearance="outline">
+        <mat-label>Unidade Superior (Opcional)</mat-label>
+        <input 
+          type="text" 
+          matInput 
+          formControlName="parent" 
+          [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayWorkplaceFn">
+          @for (option of filteredWorkplaces$ | async; track option.id) {
+            <mat-option [value]="option">
+              <span>{{ option.name }}</span>
+              <small class="option-subtitle"> ({{ option.budget_entity }})</small>
+            </mat-option>
+          }
+        </mat-autocomplete>
+        @if (isLoadingWorkplaces()) {
+          <mat-spinner matSuffix [diameter]="18"></mat-spinner>
+        }
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" [mat-dialog-close]="false" [disabled]="isSubmitting()">Fechar</button>
+    <button 
+      mat-flat-button 
+      color="primary" 
+      type="button" 
+      [disabled]="workplaceForm.invalid || workplaceForm.pending || isSubmitting()"
+      (click)="onSubmit()">
+      <div class="waiting">
+        @if (isSubmitting()) {
+          <mat-spinner [diameter]="20"></mat-spinner>
+        }
+        Atualizar local
+      </div>
+    </button>
+  </mat-dialog-actions>
+</form>

@@ -87,8 +87,8 @@
             mat-icon-button 
             type="button" 
             matTooltip="Locais de trabalho" 
-            (click)="userWorkplaces(element)" 
-            [disabled]="element.is_editable || checkPermissions('sislic/usuário atualizar')">
+            (click)="professionalWorkplaces(element)" 
+            [disabled]="element.is_editable || !element.professional?.id || checkPermissions('sislic/usuário atualizar')">
             <mat-icon>workspaces</mat-icon>
           </button>
 

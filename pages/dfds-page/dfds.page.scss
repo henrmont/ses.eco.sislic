@@ -1,0 +1,101 @@
+@use 'variables' as *;
+
+:host {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - $layout-header-height);
+}
+
+.dfds-container {
+  margin-top: $spacing-xxl; 
+  width: $page-content-width;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl; 
+
+  .table-card {
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    gap: $spacing-xl;
+    width: 100%;
+    padding: $spacing-lg;
+    box-sizing: border-box;
+  }
+
+  .search-bar {
+    display: flex; 
+    justify-content: center; 
+    width: 100%;
+
+    mat-form-field {
+      width: 100%;
+      max-width: $search-input-max-width; 
+    }
+  }
+
+  table.mat-mdc-table {
+    margin: 0 auto $spacing-sm auto;
+    background: white;
+    border-radius: $radius-md; 
+    overflow: hidden;
+    box-shadow: $shadow-card; 
+    border-collapse: separate;
+
+    th, td {
+      padding: $spacing-md $spacing-lg; 
+      vertical-align: middle;
+    }
+
+    th {
+      font-weight: $font-weight-semibold;
+      background-color: var(--md-sys-color-background);
+      color: var(--md-sys-color-inverse-surface);
+    }
+
+    .col-center {
+      text-align: center;
+      
+      div {
+        @include flex-center($spacing-xs);
+      }
+    }
+
+    // Estados Semânticos / Badges
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: $radius-sm;
+      font-size: 0.85rem;
+      font-weight: $font-weight-semibold;
+      text-transform: uppercase;
+
+      &.em_andamento, &.rascunho {
+        background-color: #e3f2fd;
+        color: #1976d2;
+      }
+
+      &.finalizado, &.aprovado {
+        background-color: #e8f5e9;
+        color: #388e3c;
+      }
+
+      &.cancelado, &.rejeitado {
+        background-color: #ffebee;
+        color: #d32f2f;
+      }
+    }
+
+    // Colunas de Largura Fixa
+    th.mat-column-code       { width: 15%; }
+    th.mat-column-title      { width: 35%; }
+    th.mat-column-sector     { width: 20%; }
+    th.mat-column-created_at { width: 10%; }
+    th.mat-column-status     { width: 10%; }
+    th.mat-column-actions    { width: 10%; }
+
+    td.actions-cell {
+      @include flex-center($spacing-xs);
+    }
+  }
+}

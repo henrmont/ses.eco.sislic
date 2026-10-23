@@ -68,6 +68,7 @@ export class RoleUpdateComponent implements OnInit {
     { label: 'USUÁRIOS', icon: 'people', filter: 'usuário' },
     { label: 'REGRAS', icon: 'security', filter: 'regra' },
     { label: 'LOCAIS DE TRABALHO', icon: 'workspaces', filter: 'local de trabalho' },
+    { label: 'DFD\'s', icon: 'assignment', filter: 'dfd' },
   ];
 
   protected readonly errorMessages: Record<string, Array<{ type: string; message: string }>> = {

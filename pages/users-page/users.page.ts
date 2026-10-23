@@ -22,6 +22,7 @@ import { Permission } from '../../../core/models/permission.model';
 import { Role } from '../../../core/models/role.model';
 import { SislicUser } from '../../models/user.model';
 import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 
 // Dialog Components
 import { UserDeleteComponent } from '../../components/users/user-delete/user-delete.component';
@@ -30,9 +31,7 @@ import { UserLockComponent } from '../../components/users/user-lock/user-lock.co
 import { UserRolesComponent } from '../../components/users/user-roles/user-roles.component';
 import { UserUpdateComponent } from '../../components/users/user-update/user-update.component';
 import { UserValidateComponent } from '../../components/users/user-validate/user-validate.component';
-import { AuthService } from '../../services/auth.service';
-// Importe aqui o componente de diálogo dos locais de trabalho quando criado:
-// import { UserWorkplacesComponent } from '../../components/users/user-workplaces/user-workplaces.component';
+import { ProfessionalWorkplacesComponent } from '../../components/users/professional-workplaces/professional-workplaces.component';
 
 interface UserTableRow extends SislicUser {
   is_editable: boolean;
@@ -40,7 +39,8 @@ interface UserTableRow extends SislicUser {
 }
 
 interface UsersDialogData {
-  user: SislicUser;
+  user?: SislicUser;
+  professional?: any;
 }
 
 @Component({
@@ -146,9 +146,12 @@ export class UsersPage implements OnInit, OnDestroy {
     this.openDialog(UserRolesComponent, { user }, '700px');
   }
 
-  protected userWorkplaces(user: SislicUser): void {
-    // Subtituir pelo seu componente de diálogo correspondente aos locais de trabalho
-    // this.openDialog(UserWorkplacesComponent, { user }, '700px');
+  protected professionalWorkplaces(user: SislicUser): void {
+    this.openDialog(
+      ProfessionalWorkplacesComponent, 
+      { professional: user.professional }, 
+      '1000px'
+    );
   }
 
   protected userDelete(user: SislicUser): void {
@@ -204,7 +207,7 @@ export class UsersPage implements OnInit, OnDestroy {
       name: item.professional?.name || item.name || '',
       module: item.module,
       professional: item.professional,
-      roles: item.roles
+      roles: item.roles,
     };
 
     return {

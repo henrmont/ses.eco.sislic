@@ -1,0 +1,69 @@
+@use 'variables' as *;
+
+:host {
+  @include dialog-base;
+}
+
+mat-dialog-content {
+  @include dialog-content;
+}
+
+.workplaces-container {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  // Container interno da tabela
+  div.table {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: $spacing-lg $spacing-lg 0;
+    box-sizing: border-box;
+  }
+
+  // Estilização da Tabela Angular Material
+  table.mat-mdc-table {
+    margin: 0 auto $spacing-sm auto;
+    width: 100%;
+    background: $color-surface;
+    border-radius: $radius-md; 
+    overflow: hidden;
+    box-shadow: $shadow-card; 
+    border-collapse: separate;
+
+    th, td {
+      padding: $spacing-md $spacing-lg; 
+      vertical-align: middle;
+    }
+
+    th {
+      font-weight: $font-weight-semibold;
+      background-color: var(--md-sys-color-background);
+      color: var(--md-sys-color-inverse-surface);
+    }
+
+    .center {
+      text-align: center;
+      div {
+        @include flex-center($spacing-xs);
+      }
+    }
+
+    // --- Larguras das Colunas ---
+    th.mat-column-budget_entity { width: 20%; }
+    th.mat-column-name          { width: 70%; }
+    th.mat-column-actions      { width: 10%; }
+
+    td.actions-cell {
+      @include flex-center($spacing-xs);
+    }
+  }
+}
+
+// Loading Shade
+.loading-shade {
+  @include flex-center(0);
+  padding: $spacing-xxl 0;
+}

@@ -29,14 +29,16 @@ import { WorkplaceCreateComponent } from '../components/workplaces/workplace-cre
 import { Professionals } from '../enums/professionals';
 import { SislicUser } from '../models/user.model';
 import { AuthService } from '../services/auth.service';
+import { DfdCreateComponent } from '../components/dfds/dfd-create/dfd-create.component';
 
 // Nomes dos canais do módulo SISLIC
-type SislicChannelKey = 'ROLES' | 'USERS' | 'WORKPLACES';
+type SislicChannelKey = 'ROLES' | 'USERS' | 'WORKPLACES' | 'DFDS';
 
 const SISLIC_CHANNEL_NAMES: Record<SislicChannelKey, string> = {
   ROLES: 'sislic-roles-channel',
   USERS: 'sislic-users-channel',
   WORKPLACES: 'sislic-workplaces-channel',
+  DFDS: 'sislic-dfds-channel'
 };
 
 interface MenuItem {
@@ -266,6 +268,34 @@ export class SislicLayout implements OnInit, OnDestroy {
         },
       ]
     },
+    {
+      subHeader: 'DFD\'s',
+      requiredTypes: [Professionals.DFD],
+      requiredPermissions: ['dfd listar', 'dfd criar', 'dfd validar'],
+      items: [
+        { 
+          label: 'DFD\'s', 
+          icon: 'assignment', 
+          types: [Professionals.DFD], 
+          permissions: ['dfd listar'], 
+          routerLink: ['dfds'] 
+        },
+        { 
+          label: 'Novo dfd', 
+          icon: 'assignment_add', 
+          types: [Professionals.DFD], 
+          permissions: ['dfd criar'], 
+          action: () => this.dfdCreate() 
+        },
+        { 
+          label: 'Validar DFD\'s', 
+          icon: 'assignment_turned_in', 
+          types: [Professionals.DFD], 
+          permissions: ['dfd validar'], 
+          routerLink: ['validate-dfds'] 
+        },
+      ]
+    },
   ];
 
   // --- MÉTODOS DE AÇÃO DO TEMPLATE HTML ---
@@ -278,6 +308,10 @@ export class SislicLayout implements OnInit, OnDestroy {
   }
         
   protected workplaceCreate(): void {
-    this.openDialog(WorkplaceCreateComponent, '500px', 'auto', 'WORKPLACES');
+    this.openDialog(WorkplaceCreateComponent, '700px', 'auto', 'WORKPLACES');
+  }
+
+  protected dfdCreate(): void {
+    this.openDialog(DfdCreateComponent, '1000px', 'auto', 'DFDS');
   }
 }

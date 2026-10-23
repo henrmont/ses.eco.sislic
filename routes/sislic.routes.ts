@@ -35,6 +35,24 @@ export const sislicRoutes: Routes = [
     }
   },
   {
+    path: 'dfds',
+    loadComponent: () => import('./../pages/dfds-page/dfds.page').then(m => m.DfdsPage),
+    canActivate: [sislicGuard],
+    data: { 
+      permission: 'sislic/dfd listar', 
+      types: [Professionals.DFD] 
+    }
+  },
+  {
+    path: 'validar-dfds',
+    loadComponent: () => import('./../pages/validate-dfds-page/validate-dfds.page').then(m => m.ValidateDfdsPage),
+    canActivate: [sislicGuard],
+    data: { 
+      permission: 'sislic/dfd validar', 
+      types: [Professionals.DFD] 
+    }
+  },
+  {
     path: '**',
     redirectTo: '',
     pathMatch: 'full'

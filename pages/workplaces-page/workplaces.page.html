@@ -1,1 +1,78 @@
-<p>workplace-page works!</p>
+<section class="workplaces-container">
+  <div class="table-card">
+    <div class="search-bar">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Buscar local de trabalho" #workplaceInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" matSort #workplaceSort="matSort">
+      <!-- Coluna Unidade Orçamentária -->
+      <ng-container matColumnDef="budget_entity">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Unidade Orçamentária </th>
+        <td mat-cell *matCellDef="let element"> {{ element.budget_entity | mask: '00.000' }} </td>
+      </ng-container>
+
+      <!-- Coluna Nome -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Nome do Local de Trabalho </th>
+        <td mat-cell *matCellDef="let element"> {{ element.name }} </td>
+      </ng-container>
+
+      <!-- Coluna Unidade Superior -->
+      <ng-container matColumnDef="parent_name">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Unidade Superior </th>
+        <td mat-cell *matCellDef="let element"> {{ element.parent_name }} </td>
+      </ng-container>
+
+      <!-- Coluna Ações -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="col-center"> Ações </th>
+        <td mat-cell *matCellDef="let element" class="col-center actions-cell">
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Detalhes do local" 
+            (click)="workplaceDetail(element)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Atualizar local" 
+            (click)="workplaceUpdate(element)" 
+            [disabled]="checkPermissions('sislic/local de trabalho atualizar')">
+            <mat-icon>drive_file_rename_outline</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Deletar local" 
+            (click)="workplaceDelete(element)" 
+            [disabled]="checkPermissions('sislic/local de trabalho deletar')">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell col-center" [attr.colspan]="displayedColumns.length">
+          <p>Nenhum resultado encontrado.</p>
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator 
+      #workplacePaginator 
+      [pageSize]="8" 
+      [hidePageSize]="true">
+    </mat-paginator>
+  </div>
+</section>

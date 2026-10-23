@@ -1,0 +1,299 @@
+@use 'variables' as *;
+
+:host {
+  @include dialog-base;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.dialog-body {
+  padding: $spacing-lg;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+// ==========================================
+// Card Introdutório (Dados do Requisitante)
+// ==========================================
+mat-card.intro-card {
+  background: $color-card-bg;
+  border-radius: $radius-md; 
+  box-shadow: $shadow-soft; 
+  padding: $spacing-sm;
+
+  mat-card-subtitle {
+    font-weight: $font-weight-semibold;
+    color: var(--md-sys-color-primary, #1976d2);
+    letter-spacing: 0.5px;
+  }
+}
+
+// Estrutura de Linhas e Grids do Card Introdutório
+.line {
+  display: grid;
+  gap: $spacing-md; 
+  padding: 0 $spacing-md; 
+  align-items: center; 
+  color: $color-text-main;
+  min-height: $line-height-min-item; 
+
+  strong {
+    color: $color-text-variant;
+    font-weight: $font-weight-semibold;
+  }
+
+  &.cols-1-col { 
+    grid-template-columns: 1fr; 
+  }
+
+  &.cols-1-1 { 
+    grid-template-columns: 1fr 1fr; 
+  }
+
+  &.cols-2-2 {
+    grid-template-columns: 1fr 1fr;
+    gap: $spacing-sm $spacing-md;
+  }
+}
+
+// Campo de Unidade Orçamentária com Mini FAB Reduzido
+.workplace-field {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .scaled-fab {
+    transform: scale(0.75);
+    box-shadow: $shadow-soft;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// ==========================================
+// Estrutura do Stepper e Seções
+// ==========================================
+.margin-top-xs {
+  margin-top: $spacing-xs;
+}
+
+.margin-top {
+  margin-top: $spacing-md;
+}
+
+.margin-top-lg {
+  margin-top: $spacing-xl;
+}
+
+.step-content {
+  padding: $spacing-md 0;
+}
+
+.section-box {
+  padding: $spacing-md;
+  border: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+  border-radius: $radius-md;
+  background-color: white;
+}
+
+.step-action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+
+  .scaled-fab {
+    transform: scale(0.75);
+    box-shadow: $shadow-soft;
+    
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+}
+
+// ==========================================
+// Listas de Opções com Estados Semânticos (Itens 1 e 2)
+// Verde (Selecionado) e Vermelho (Não Selecionado)
+// ==========================================
+.status-options-list,
+.object-types-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.status-option-item,
+.object-type-item {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: 0.95rem;
+  font-weight: $font-weight-semibold;
+  padding: 4px 8px;
+  border-radius: $radius-sm;
+  width: fit-content;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  // Estado Selecionado (Verde)
+  &.selected {
+    color: #2e7d32;
+    background-color: #e8f5e9;
+
+    mat-icon {
+      color: #2e7d32;
+    }
+  }
+
+  // Estado Não Selecionado (Vermelho)
+  &.unselected {
+    color: #c62828;
+    background-color: #ffebee;
+
+    mat-icon {
+      color: #c62828;
+    }
+  }
+}
+
+// ==========================================
+// Elementos Específicos do Item 2 (ARP e ETP)
+// ==========================================
+.arp-details-box {
+  padding: $spacing-sm $spacing-md;
+  background-color: var(--md-sys-color-surface-variant, #f5f5f5);
+  border-radius: $radius-sm;
+  border: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+}
+
+.etp-status-box {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .etp-badge-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+}
+
+// ==========================================
+// Elementos Gerais de Leitura
+// ==========================================
+.label {
+  font-size: 0.85rem;
+  color: var(--md-sys-color-outline, #757575);
+  font-weight: $font-weight-semibold;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 0.95rem;
+  color: var(--md-sys-color-on-surface, #212121);
+}
+
+.font-bold {
+  font-weight: $font-weight-semibold;
+}
+
+.text-content {
+  margin: $spacing-xs 0 0;
+  padding: $spacing-sm;
+  background: var(--md-sys-color-surface-variant, #f5f5f5);
+  border-radius: $radius-sm;
+  border: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+  white-space: pre-wrap;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+// Tabela de Itens (Item 3.1)
+.display-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: $spacing-xs;
+
+  th, td {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+    text-align: left;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    font-weight: $font-weight-semibold;
+  }
+
+  .col-center {
+    text-align: center;
+  }
+}
+
+// Tag de Prioridade (Item 7)
+.priority-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: $radius-sm;
+  font-weight: $font-weight-semibold;
+  font-size: 0.85rem;
+
+  &.alto, &.crítico {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+
+  &.médio {
+    background-color: #fff8e1;
+    color: #f57f17;
+  }
+
+  &.baixo {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+}
+
+// Rodapé e Ações do Diálogo
+.step-actions {
+  display: flex;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+}
+
+.dialog-footer {
+  padding: $spacing-md $spacing-lg;
+  border-top: 1px solid var(--md-sys-color-outline-variant, #e0e0e0);
+}

@@ -1,0 +1,424 @@
+<div class="dialog-header">
+  <h2 mat-dialog-title>DOCUMENTO DE FORMALIZAÇÃO DA DEMANDA – DFD {{ dfd?.dfd_number ? ('Nº ' + dfd?.dfd_number) : '' }}</h2>
+  <button mat-icon-button type="button" (click)="close()" class="close-button">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content class="dialog-body">
+
+  <!-- PARTE INTRODUTÓRIA EM CARD -->
+<mat-card appearance="outlined" class="detail-card intro-card">
+  <mat-card-header>
+    <mat-card-subtitle>IDENTIFICAÇÃO DA DEMANDA E SETOR REQUISITANTE</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <!-- Linha 1: Órgão e Unidade Orçamentária com Botão FAB -->
+    <div class="line cols-1-1">
+      <div>
+        <strong>Órgão:</strong> {{ orgaoFixo }}
+      </div>
+      <div class="workplace-field">
+        <div>
+          <strong>Unidade Orçamentária:</strong> {{ dfd?.workplace?.name || 'Não selecionada' }}
+        </div>
+        <button 
+          mat-mini-fab 
+          type="button" 
+          color="primary" 
+          class="scaled-fab"
+          matTooltip="Alterar Unidade Orçamentária" 
+          (click)="changeWorkplace()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Linha 2 (Meio): Setor Requisitante isolado em linha inteira -->
+    <div class="line cols-1-col margin-top">
+      <div>
+        <strong>Setor Requisitante:</strong> {{ dfd?.workplace?.name || 'Não informado' }}
+      </div>
+    </div>
+
+    <!-- Linha 3 (Última): Responsável, Matrícula, Email e Telefone agrupados -->
+    <div class="line cols-2-2 margin-top">
+      <div>
+        <strong>Responsável pela Demanda:</strong> {{ dfd?.owner_professional?.name || currentUser()?.professional?.name || currentUser()?.name || 'Não informado' }}
+      </div>
+      <div>
+        <strong>Matrícula:</strong> {{ dfd?.owner_professional?.registration || currentUser()?.professional?.registration || 'Não informado' }}
+      </div>
+      <div>
+        <strong>E-mail:</strong> {{ dfd?.owner_professional?.user?.email || currentUser()?.email || 'Não informado' }}
+      </div>
+      <div>
+        <strong>Telefone:</strong>
+        @if (dfd?.owner_professional?.phone || currentUser()?.professional?.phone; as phoneVal) {
+          {{ phoneVal | mask: '(00) 00000-0000' }}
+        } @else {
+          Não informado
+        }
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+  <!-- STEPPER DE VISUALIZAÇÃO (1 A 8) -->
+  <mat-stepper orientation="vertical" [linear]="false" #stepper class="margin-top-lg">
+
+    <!-- STEP 1 - OBJETO (SOLUÇÃO PRELIMINAR) -->
+<mat-step>
+  <ng-template matStepLabel>1. OBJETO (SOLUÇÃO PRELIMINAR)</ng-template>
+  <div class="step-content">
+    
+    <!-- Opções do Objeto com Status Visual -->
+    <div class="section-box">
+      <div class="step-action-bar">
+        <span class="label font-bold">1. Opções do Objeto:</span>
+        <button 
+          mat-mini-fab 
+          type="button" 
+          color="primary" 
+          class="scaled-fab"
+          matTooltip="Editar Opções do Objeto" 
+          (click)="editObjectTypes()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+
+      <div class="object-types-list">
+        @for (option of objectTypeOptions; track option.key) {
+          @let selected = isObjectTypeSelected(option.key);
+          <div class="object-type-item" [ngClass]="selected ? 'selected' : 'unselected'">
+            <mat-icon>{{ selected ? 'check' : 'close' }}</mat-icon>
+            <span>{{ option.label }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Justificativa / Descrição da Demanda (Item 1.1) -->
+    <div class="section-box margin-top">
+      <div class="step-action-bar">
+        <span class="label font-bold">1.1. Descrição da demanda:</span>
+        <button 
+          mat-mini-fab 
+          type="button" 
+          color="primary" 
+          class="scaled-fab"
+          matTooltip="Editar Descrição da Demanda" 
+          (click)="editDemandDescription()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <p class="text-content">{{ dfd?.demand_description || 'Nenhuma descrição informada.' }}</p>
+    </div>
+
+  </div>
+  <div class="step-actions">
+    <button mat-button matStepperNext type="button">Próximo</button>
+  </div>
+</mat-step>
+
+    <!-- STEP 2 - FORMA DE CONTRATAÇÃO SUGERIDA -->
+<mat-step>
+  <ng-template matStepLabel>2. FORMA DE CONTRATAÇÃO SUGERIDA</ng-template>
+  <div class="step-content">
+    
+    <!-- Opções de Forma de Contratação (Seleção Única) -->
+    <div class="section-box">
+      <div class="step-action-bar">
+        <span class="label font-bold">2. Forma de Contratação Sugerida:</span>
+        <button 
+          mat-mini-fab 
+          type="button" 
+          color="primary" 
+          class="scaled-fab"
+          matTooltip="Editar Forma de Contratação" 
+          (click)="editProcurementMethod()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+
+      <!-- Lista Visual de Seleção Exclusiva -->
+      <div class="status-options-list">
+        @for (option of procurementMethodOptions; track option.key) {
+          @let selected = isProcurementMethodSelected(option.key);
+          <div class="status-option-item" [ngClass]="selected ? 'selected' : 'unselected'">
+            <mat-icon>{{ selected ? 'check' : 'close' }}</mat-icon>
+            <span>{{ option.label }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Detalhamento de ARP (Exibido somente se a forma selecionada exigir dados de ARP) -->
+      @if (dfd?.procurement_method === 'UTILIZACAO_ARP' || dfd?.procurement_method === 'ADESAO_ARP') {
+        <div class="arp-details-box margin-top">
+          <span class="label font-bold">Detalhamento da Ata de Registro de Preço (ARP):</span>
+          <div class="info-grid margin-top-xs">
+            <div class="info-item">
+              <span class="label">Identificação da ARP:</span>
+              <span class="value">{{ dfd?.price_registration_identification || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Edital de Origem:</span>
+              <span class="value">{{ dfd?.price_registration_originating_notice || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Data de Publicação:</span>
+              <span class="value">{{ dfd?.price_registration_publication_date || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Data de Vigência:</span>
+              <span class="value">{{ dfd?.price_registration_expiration_date || '-' }}</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Estudo Técnico Preliminar (ETP) com Botão de Edição Dedicado -->
+    <div class="section-box margin-top">
+      <div class="step-action-bar">
+        <span class="label font-bold">Necessidade de Estudo Técnico Preliminar (ETP):</span>
+        <button 
+          mat-mini-fab 
+          type="button" 
+          color="primary" 
+          class="scaled-fab"
+          matTooltip="Editar Necessidade/Justificativa do ETP" 
+          (click)="editEtpRequirement()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+
+      <div class="etp-status-box">
+        <div class="etp-badge-container">
+          <span class="label">Requer ETP?</span>
+          <div class="status-option-item" [ngClass]="dfd?.preliminary_technical_study_required ? 'selected' : 'unselected'">
+            <mat-icon>{{ dfd?.preliminary_technical_study_required ? 'check' : 'close' }}</mat-icon>
+            <span>{{ dfd?.preliminary_technical_study_required ? 'SIM' : 'NÃO' }}</span>
+          </div>
+        </div>
+
+        @if (!dfd?.preliminary_technical_study_required) {
+          <div class="margin-top-xs">
+            <span class="label font-bold">Justificativa para Dispensa de ETP:</span>
+            <p class="text-content">{{ dfd?.preliminary_technical_study_justification || 'Nenhuma justificativa informada.' }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+  </div>
+  <div class="step-actions">
+    <button mat-button matStepperPrevious type="button">Voltar</button>
+    <button mat-button matStepperNext type="button">Próximo</button>
+  </div>
+</mat-step>
+
+    <!-- STEP 3 - JUSTIFICATIVA DA NECESSIDADE -->
+    <mat-step>
+      <ng-template matStepLabel>3. JUSTIFICATIVA DA NECESSIDADE</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Justificativa e Itens
+          </button>
+        </div>
+
+        <div class="info-block">
+          <span class="label">Justificativa da Necessidade:</span>
+          <p class="text-content">{{ dfd?.need_justification || 'Não informada.' }}</p>
+        </div>
+
+        <div class="margin-top">
+          <h4>3.1. Quantidade de serviço/material da solução a ser contratada:</h4>
+          <table class="display-table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Descrição</th>
+                <th class="col-center">Unid.</th>
+                <th class="col-center">Qtde</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of dfd?.items; track $index) {
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td>{{ item.description }}</td>
+                  <td class="col-center">{{ item.supply_unit }}</td>
+                  <td class="col-center">{{ item.quantity }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="4" class="col-center">Nenhum item cadastrado.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-block margin-top">
+          <span class="label">3.2. Estimativa de Quantitativo (Memória de Cálculo):</span>
+          <p class="text-content">{{ dfd?.quantity_estimation_basis || 'Não informada.' }}</p>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+        <button mat-button matStepperNext type="button">Próximo</button>
+      </div>
+    </mat-step>
+
+    <!-- STEP 4 - VALOR ESTIMADO E PTA -->
+    <mat-step>
+      <ng-template matStepLabel>4. VALOR ESTIMADO DA CONTRATAÇÃO (PREVISÃO ORÇAMENTÁRIA – PTA)</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Dotação
+          </button>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="label">Valor Estimado:</span>
+            <span class="value font-bold">{{ dfd?.estimated_value ? ('R$ ' + dfd?.estimated_value) : '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Projeto/Atividade:</span>
+            <span class="value">{{ dfd?.budget_project_activity || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Elemento de Despesa:</span>
+            <span class="value">{{ dfd?.budget_expense_element || '-' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="label">Fonte de Recurso:</span>
+            <span class="value">{{ dfd?.budget_funding_source || '-' }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+        <button mat-button matStepperNext type="button">Próximo</button>
+      </div>
+    </mat-step>
+
+    <!-- STEP 5 - DATA PRETENDIDA -->
+    <mat-step>
+      <ng-template matStepLabel>5. DATA PRETENDIDA PARA A AQUISIÇÃO/CONTRATAÇÃO</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Data
+          </button>
+        </div>
+
+        <div class="info-block">
+          <span class="label">Data Pretendida:</span>
+          <span class="value font-bold">{{ dfd?.target_procurement_date | date: 'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+        <button mat-button matStepperNext type="button">Próximo</button>
+      </div>
+    </mat-step>
+
+    <!-- STEP 6 - PLANEJAMENTO ESTRATÉGICO -->
+    <mat-step>
+      <ng-template matStepLabel>6. INDICAÇÃO DA CORRELAÇÃO COM O PLANEJAMENTO ESTRATÉGICO</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Alinhamento
+          </button>
+        </div>
+
+        <div class="info-block">
+          <span class="label">Alinhamento ao PTA e Planejamento Estratégico:</span>
+          <p class="text-content">{{ dfd?.strategic_planning_alignment || 'Não informado.' }}</p>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+        <button mat-button matStepperNext type="button">Próximo</button>
+      </div>
+    </mat-step>
+
+    <!-- STEP 7 - GRAU DE PRIORIDADE -->
+    <mat-step>
+      <ng-template matStepLabel>7. GRAU DE PRIORIDADE DA COMPRA OU DA CONTRATAÇÃO</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Prioridade
+          </button>
+        </div>
+
+        <div class="info-block">
+          <span class="label">Nível de Prioridade:</span>
+          <span class="value priority-tag">
+            {{ dfd?.priority_level || '-' }}
+          </span>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+        <button mat-button matStepperNext type="button">Próximo</button>
+      </div>
+    </mat-step>
+
+    <!-- STEP 8 - EQUIPE DE PLANEJAMENTO -->
+    <mat-step>
+      <ng-template matStepLabel>8. INDICAÇÃO DO(S) MEMBRO(S) DA EQUIPE DE PLANEJAMENTO</ng-template>
+      <div class="step-content">
+        <div class="step-action-bar">
+          <button mat-stroked-button color="primary" type="button">
+            <mat-icon>edit</mat-icon> Editar Equipe
+          </button>
+        </div>
+
+        <div class="margin-top">
+          <h4>INTEGRANTE REQUISITANTE</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Nome:</span>
+              <span class="value">{{ dfd?.owner_professional?.name || currentUser()?.professional?.name || '-' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Matrícula:</span>
+              <span class="value">{{ dfd?.owner_professional?.registration || currentUser()?.professional?.registration || '-' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="margin-top">
+          <h4>AUTORIDADE APROVADORA ("DE ACORDO")</h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="label">Nome:</span>
+              <span class="value">{{ dfd?.validate_professional?.name || 'Pendente de validação' }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Matrícula:</span>
+              <span class="value">{{ dfd?.validate_professional?.registration || '-' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step-actions">
+        <button mat-button matStepperPrevious type="button">Voltar</button>
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</div>
+
+<div mat-dialog-actions align="end" class="dialog-footer">
+  <button mat-button type="button" (click)="close()">Fechar</button>
+</div>

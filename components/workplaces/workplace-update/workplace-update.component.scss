@@ -1,0 +1,26 @@
+@use 'variables' as *;
+
+:host {
+  @include dialog-base;
+}
+
+mat-dialog-content {
+  @include dialog-content;
+  padding-top: $spacing-modal-pt;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: var(--grid-cols, 1fr);
+  column-gap: $spacing-xl;
+  row-gap: $spacing-form-gap;
+
+  &.cols-1-1 { 
+    --grid-cols: 1fr 1fr; 
+  }
+}
+
+.option-subtitle {
+  color: var(--md-sys-color-outline);
+  font-size: 0.85em;
+}

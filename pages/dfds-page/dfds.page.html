@@ -1,0 +1,94 @@
+<section class="dfds-container">
+  <div class="table-card">
+    <div class="search-bar">
+      <mat-form-field appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Buscar DFD" #dfdInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <table mat-table [dataSource]="dataSource" matSort #dfdSort="matSort">
+      <!-- Coluna Código -->
+      <ng-container matColumnDef="code">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Código </th>
+        <td mat-cell *matCellDef="let element"> {{ element.code }} </td>
+      </ng-container>
+
+      <!-- Coluna Título -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Título </th>
+        <td mat-cell *matCellDef="let element"> {{ element.title }} </td>
+      </ng-container>
+
+      <!-- Coluna Setor -->
+      <ng-container matColumnDef="sector">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Setor </th>
+        <td mat-cell *matCellDef="let element"> {{ element.sector?.name || '-' }} </td>
+      </ng-container>
+
+      <!-- Coluna Data -->
+      <ng-container matColumnDef="created_at">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Data </th>
+        <td mat-cell *matCellDef="let element"> {{ element.created_at | date: 'dd/MM/yyyy' }} </td>
+      </ng-container>
+
+      <!-- Coluna Status -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="col-center" mat-sort-header> Status </th>
+        <td mat-cell *matCellDef="let element" class="col-center">
+          <span class="status-badge">
+            {{ element.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Coluna Ações -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef class="col-center"> Ações </th>
+        <td mat-cell *matCellDef="let element" class="col-center actions-cell">
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Detalhes do DFD" 
+            (click)="dfdDetail(element)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Editar DFD" 
+            (click)="dfdUpdate(element)" 
+            [disabled]="!element.is_editable || checkPermissions('sislic/dfd atualizar')">
+            <mat-icon>drive_file_rename_outline</mat-icon>
+          </button>
+
+          <button 
+            mat-icon-button 
+            type="button" 
+            matTooltip="Deletar DFD" 
+            (click)="dfdDelete(element)" 
+            [disabled]="!element.is_editable || checkPermissions('sislic/dfd deletar')">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell col-center" [attr.colspan]="displayedColumns.length">
+          <p>Nenhum resultado encontrado.</p>
+        </td>
+      </tr>
+    </table>
+
+    <mat-paginator 
+      #dfdPaginator 
+      [pageSize]="8" 
+      [hidePageSize]="true">
+    </mat-paginator>
+  </div>
+</section>

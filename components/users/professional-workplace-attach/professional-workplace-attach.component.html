@@ -1,0 +1,56 @@
+<h2 mat-dialog-title>Vincular local de trabalho</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="attachForm">
+    <div class="stepper">
+
+      <!-- Linha 1: Autocomplete de Local de Trabalho -->
+      <div class="line cols-1-col">
+        <mat-form-field appearance="outline">
+          <mat-label>Local de trabalho</mat-label>
+          <input 
+            type="text" 
+            matInput 
+            formControlName="workplace" 
+            [matAutocomplete]="auto"
+            placeholder="Digite para buscar..."
+          >
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+            @for (item of filteredWorkplaces(); track item.id) {
+              <mat-option [value]="item">
+                {{ item.name }} {{ item.budget_entity ? '(' + item.budget_entity + ')' : '' }}
+              </mat-option>
+            }
+          </mat-autocomplete>
+
+          @for (item of errorMessages['workplace']; track $index) {
+            <mat-error [hidden]="!attachForm.get('workplace')?.hasError(item.type)">
+              {{ item.message }}
+            </mat-error>
+          }
+        </mat-form-field>
+      </div>
+
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" [mat-dialog-close]="false" [disabled]="isSubmitting()">
+    Fechar
+  </button>
+  <button 
+    mat-flat-button 
+    color="primary" 
+    type="button" 
+    [disabled]="attachForm.invalid || isSubmitting() || isLoadingWorkplaces()" 
+    (click)="onSubmit()"
+  >
+    <div class="waiting">
+      @if (isSubmitting()) {
+        <mat-spinner [diameter]="20"></mat-spinner>
+      }
+      Vincular
+    </div>
+  </button>
+</mat-dialog-actions>
